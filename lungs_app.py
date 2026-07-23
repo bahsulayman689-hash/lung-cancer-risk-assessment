@@ -190,19 +190,19 @@ if st.button("Generate Diagnostic Risk Report", type="primary", use_container_wi
     input_dict = {
         'GENDER': encoders['GENDER'].transform([gender]),
         'AGE': age,
-        'SMOKING': encoders['SMOKING'].transform([clinical_map[smoking]]),
-        'YELLOW_FINGERS': encoders['YELLOW_FINGERS'].transform([clinical_map[yellow_fingers]]),
-        'ANXIETY': encoders['ANXIETY'].transform([clinical_map[anxiety]]),
-        'PEER_PRESSURE': encoders['PEER_PRESSURE'].transform([clinical_map[peer_pressure]]),
-        'CHRONIC DISEASE': encoders['CHRONIC DISEASE'].transform([clinical_map[chronic_disease]]),
-        'FATIGUE ': encoders['FATIGUE '].transform([clinical_map[fatigue]]), 
-        'ALLERGY ': encoders['ALLERGY '].transform([clinical_map[allergy]]),
-        'WHEEZING': encoders['WHEEZING'].transform([clinical_map[wheezing]]),
-        'ALCOHOL CONSUMING': encoders['ALCOHOL CONSUMING'].transform([clinical_map[alcohol_consumption]]),
-        'COUGHING': encoders['COUGHING'].transform([clinical_map[coughing]]),
-        'SHORTNESS OF BREATH': encoders['SHORTNESS OF BREATH'].transform([clinical_map[shortness_of_breath]]),
-        'SWALLOWING DIFFICULTY': encoders['SWALLOWING DIFFICULTY'].transform([clinical_map[swallowing_difficulty]]),
-        'CHEST PAIN': encoders['CHEST PAIN'].transform([clinical_map[chest_pain]])
+        'SMOKING': encoders['SMOKING'].transform([clinical_map[smoking]])[0],
+        'YELLOW_FINGERS': encoders['YELLOW_FINGERS'].transform([clinical_map[yellow_fingers]])[0],
+        'ANXIETY': encoders['ANXIETY'].transform([clinical_map[anxiety]])[0],
+        'PEER_PRESSURE': encoders['PEER_PRESSURE'].transform([clinical_map[peer_pressure]])[0],
+        'CHRONIC DISEASE': encoders['CHRONIC DISEASE'].transform([clinical_map[chronic_disease]])[0],
+        'FATIGUE ': encoders['FATIGUE '].transform([clinical_map[fatigue]])[0], 
+        'ALLERGY ': encoders['ALLERGY '].transform([clinical_map[allergy]])[0],
+        'WHEEZING': encoders['WHEEZING'].transform([clinical_map[wheezing]])[0],
+        'ALCOHOL CONSUMING': encoders['ALCOHOL CONSUMING'].transform([clinical_map[alcohol_consumption]])[0],
+        'COUGHING': encoders['COUGHING'].transform([clinical_map[coughing]])[0],
+        'SHORTNESS OF BREATH': encoders['SHORTNESS OF BREATH'].transform([clinical_map[shortness_of_breath]])[0],
+        'SWALLOWING DIFFICULTY': encoders['SWALLOWING DIFFICULTY'].transform([clinical_map[swallowing_difficulty]])[0],
+        'CHEST PAIN': encoders['CHEST PAIN'].transform([clinical_map[chest_pain]])[0]
     }
     
     # Generate engineered interaction row variables on the fly using encoded integer values
@@ -216,7 +216,7 @@ if st.button("Generate Diagnostic Risk Report", type="primary", use_container_wi
     
     # Compute XGBoost classifications and positive-class risk probabilities
     prediction = model.predict(input_scaled)
-    probabilities = model.predict_proba(input_scaled)
+    probabilities = model.predict_proba(input_scaled)[0][1]
     
     cancer_probability = probabilities * 100
     negative_probability = probabilities * 100
