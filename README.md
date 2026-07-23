@@ -9,8 +9,8 @@ Built with **Python**, **Streamlit**, and **Scikit-Learn** by **Sulayman Bah**.
 ---
 
 ## 🚀 Live Demo
-* **App URL:** [Insert your deployed Streamlit Cloud link here]
-* **Developer Portfolio:** [GitHub](https://github.com) | [LinkedIn](https://linkedin.com)
+* **App URL:** [https://lung-cancer-risk-assessment-bah.streamlit.app/]
+* **Developer Portfolio:** [GitHub](https://github.com/bahsulayman689-hash)|[LinkedIn(https://www.linkedin.com/in/sulayman-bah-8a7096423/)
 
 ---
 
