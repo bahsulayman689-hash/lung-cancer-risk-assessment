@@ -187,15 +187,16 @@ if st.button("Generate Diagnostic Risk Report", type="primary", use_container_wi
     clinical_map = {"YES": "2", "NO": "1"}
     
     # Pass matching string representations down to encoders.transform() safely
+        # Pass matching string representations down to encoders.transform() safely
     input_dict = {
-        'GENDER': encoders['GENDER'].transform([gender]),
+        'GENDER': encoders['GENDER'].transform([gender])[0],
         'AGE': age,
         'SMOKING': encoders['SMOKING'].transform([clinical_map[smoking]])[0],
         'YELLOW_FINGERS': encoders['YELLOW_FINGERS'].transform([clinical_map[yellow_fingers]])[0],
         'ANXIETY': encoders['ANXIETY'].transform([clinical_map[anxiety]])[0],
         'PEER_PRESSURE': encoders['PEER_PRESSURE'].transform([clinical_map[peer_pressure]])[0],
         'CHRONIC DISEASE': encoders['CHRONIC DISEASE'].transform([clinical_map[chronic_disease]])[0],
-        'FATIGUE ': encoders['FATIGUE '].transform([clinical_map[fatigue]])[0], 
+        'FATIGUE ': encoders['FATIGUE '].transform([clinical_map[fatigue]])[0],
         'ALLERGY ': encoders['ALLERGY '].transform([clinical_map[allergy]])[0],
         'WHEEZING': encoders['WHEEZING'].transform([clinical_map[wheezing]])[0],
         'ALCOHOL CONSUMING': encoders['ALCOHOL CONSUMING'].transform([clinical_map[alcohol_consumption]])[0],
@@ -205,29 +206,36 @@ if st.button("Generate Diagnostic Risk Report", type="primary", use_container_wi
         'CHEST PAIN': encoders['CHEST PAIN'].transform([clinical_map[chest_pain]])[0]
     }
     
-    # Generate engineered interaction row variables on the fly using encoded integer values
+    # Inject the engineered interaction term required by your StandardScaler matrix
     input_dict['ANXYELFIN'] = input_dict['ANXIETY'] * input_dict['YELLOW_FINGERS']
     
-    # Align rows with feature layout columns sequence order
-    input_df = pd.DataFrame([input_dict])[feature_columns]
+    # Convert input array configuration directly into a Pandas DataFrame
+    input_df = pd.DataFrame([input_dict])
     
-    # Scale feature values uniformly using the fitted training scaler parameters
+    # Lock exact training data column order tracking sequence to prevent misalignment
+    input_df = input_df[feature_columns]
+    
+    # Transform input scaling arrays safely
     input_scaled = scaler.transform(input_df)
     
-    # Compute XGBoost classifications and positive-class risk probabilities
-    prediction = model.predict(input_scaled)
-    probabilities = model.predict_proba(input_scaled)[0][1]
+    # Run structural prediction probabilities using your model 
+    prediction_proba = model.predict_proba(input_scaled)[0][1]
     
-    cancer_probability = probabilities * 100
-    negative_probability = probabilities * 100
+    # ----------------------------------------------------------------------------------------------
+    # 6. METRICS DISPLAY WINDOWS
+    # ----------------------------------------------------------------------------------------------
+    st.subheader("📊 Diagnostic Assessment Results")
     
-    st.subheader("Screening Outcome Profile:")
+    metric_col1, metric_col2 = st.columns(2)
     
-    if prediction == 1:
-        st.error(f"🚨 **High Risk Warning:** The diagnostic matrix indicates a high probability of **LUNG CANCER (Positive)**.")
-        st.write(f"📈 Malignancy Risk Level: {cancer_probability:.2f}% | Negative Screening Confidence: {negative_probability:.2f}%")
-        st.progress(int(cancer_probability))
+    with metric_col1:
+        st.metric(label="Risk Probability Score", value=f"{prediction_proba * 100:.2f}%")
+        
+    with metric_col2:
+        risk_status = "🔴 HIGH RISK" if prediction_proba >= 0.50 else "🟢 LOW RISK"
+        st.metric(label="Clinical Categorization", value=risk_status)
+        
+    if prediction_proba >= 0.50:
+        st.error("⚠️ **Notice:** High-risk indicators match historical positive baseline sets. Urgent specialist review is advised.")
     else:
-        st.success(f"✅ Low Risk Clear: The diagnostic matrix indicates a low probability of LUNG CANCER (Negative).")
-        st.write(f"📈 Negative Screening Confidence: {negative_probability:.2f}% | Malignancy Risk Level: {cancer_probability:.2f}%")
-        st.progress(int(negative_probability))
+        st.success("✅ **Notice:** Low matching footprint calculated relative to background target thresholds.")
